@@ -44,11 +44,12 @@ Some useful base knowledge of the Push file system/linux distro.
 
 ### Paths
 
-| Path                               | Descriptor                |
-| ---------------------------------- | ------------------------- |
-| `~/.local/share/Ableton`           | Ableton install directory |
-| `~/.local/share/Max 8`             | Max 8 root directory      |
-| `~/.config/Cycling '74/Max 8/Logs` | Max 8 Log directory       |
+| Path                                                 | Descriptor                | Platform        |
+| ---------------------------------------------------- | ------------------------- | --------------- |
+| `~/.local/share/Ableton`                             | Ableton install directory | Push Standalone |
+| `~/.local/share/Max 8`                               | Max 8 root directory      | Push Standalone |
+| `~/.config/Cycling '74/Max 8/Logs`                   | Max 8 Log directory       | Push Standalone |
+| `C:/Users/<username>/AppData/Cycling '74/Max 8/Logs` | Max 8 Log directory       | Windows         |
 
 ## Max4Live
 
