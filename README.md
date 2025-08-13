@@ -107,6 +107,97 @@ https://monome.org/docs/serialosc/linux/
 
 Follow the remote scripts setup section outlined above and install [AbletonOSC remote script](https://github.com/ideoforms/AbletonOSC) on push
 
+
+## Scripts
+
+
+### System Explorer Script
+
+This script (`system_explorer.sh`) is designed to **quickly explore an undocumented Linux system**, either locally or remotely over SSH, and output the findings in **structured YAML** format.  
+It gathers OS, hardware, network, cron, services, users, environment variables, and package manager information in a format that can be read by both humans and tools like `yq`, Python, or Ansible.  
+
+#### Features
+- **Local or remote exploration** (`--remote user@host`)
+- **Structured YAML output** for easy parsing
+- **Live streaming logs** with timestamps in verbose mode
+- Safe read-only system inspection
+- Detects installed package managers and their paths
+
+#### Usage
+```bash
+./system_explorer.sh [OPTIONS]
+````
+
+**Options**
+
+| Option                         | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `--help`                       | Show usage help                                                        |
+| `--verbose`, `-v`              | Print collected data to console live with timestamps                   |
+| `--output <file>`, `-o <file>` | Save collected data to a YAML file                                     |
+| `--remote <host>`, `-r <host>` | SSH into `<host>` (e.g., `user@hostname`) and run exploration remotely |
+
+---
+
+#### Commands Executed
+
+The script only runs **read-only** commands to gather information.
+Below is the full list of commands it may execute on the target system:
+
+**OS Information**
+
+* `uname -a`
+* `cat /etc/*release`
+
+**Hardware Information**
+
+* `lscpu`
+* `lsblk`
+* `free -h`
+* `df -h`
+
+**Network Information**
+
+* `ip addr show`
+* `ip route show`
+
+**Cron Jobs**
+
+* `crontab -l` (for the current user)
+* `ls -l /etc/cron*`
+
+**Services**
+
+* `systemctl list-units --type=service --all`
+  *(falls back to)*
+* `service --status-all`
+
+**Users**
+
+* `cat /etc/passwd`
+
+**Environment Variables**
+
+* `printenv`
+
+**Package Manager Detection**
+
+* Checks for the existence of:
+
+  * `apt`
+  * `yum`
+  * `dnf`
+  * `zypper`
+  * `pacman`
+  * `apk`
+* Uses: `command -v <package_manager>` to find install path
+
+---
+
+**Security Note:**
+All executed commands are **non-destructive** and run with the privileges of the user executing the script.
+When using `--remote`, commands are executed via SSH, and any required credentials or SSH keys must already be configured.
+
 ## Resources/Link Tree
 
 A list of links I've found useful while exploring what sort of fun stuff can be added to push 3 standalone.
