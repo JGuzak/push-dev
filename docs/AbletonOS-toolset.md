@@ -33,73 +33,74 @@ Target context observed during collection:
 
 ### Remote Access And Shell
 
-| Tool         | Status    | Notes                                                               |
-| ------------ | --------- | ------------------------------------------------------------------- |
-| `ssh` server | Available | Remote root shell access worked through the configured `push` host. |
-| `scp` server | Available | Kernel modules were copied to Push for loader tests.                |
-| `sh`         | Available | Used for compound remote commands.                                  |
-| `test`       | Available | Used in install scripts to check remote files and directories.      |
-| `mkdir`      | Available | Used to create `~/pushbridge-temp`.                                 |
-| `printf`     | Available | Used for remote `$HOME` resolution.                                 |
+| Tool         | Status    | Version                                    | Notes                                                                                                             |
+| ------------ | --------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `ssh` server | Available | `OpenSSH_8.9p1, OpenSSL 3.0.17 1 Jul 2025` | OpenSSH server observed via `/usr/sbin/sshd`. Remote root shell access worked through the configured `push` host. |
+| `scp` server | Available | `OpenSSH_8.9p1`                            | Served by the same OpenSSH stack as `sshd`. Used to copy modules and test artifacts to Push.                      |
+| `rsync`      | Available | `3.2.7` (protocol 31)                      | Installed on Push and usable for remote sync/copy workflows.                                                      |
+| `sh`         | Available | `GNU bash 5.1.16(1)-release`               | `/bin/sh` resolved to a bash-based shell on this image.                                                           |
+| `test`       | Available | Bash builtin                               | Shell builtin from the installed bash shell.                                                                      |
+| `mkdir`      | Available | `GNU coreutils 9.0`                        | Used to create `~/pushbridge-temp`.                                                                               |
+| `printf`     | Available | Bash builtin                               | Used for remote `$HOME` resolution.                                                                               |
 
 ### Core Inspection Utilities
 
-| Tool             | Status    | Notes                                                                   |
-| ---------------- | --------- | ----------------------------------------------------------------------- |
-| `cat`            | Available | Used for `/proc/version`, `/proc/asound/*`, and other proc/sysfs files. |
-| `ls`             | Available | Used for `/dev/snd`, `/lib/modules`, and filesystem inspection.         |
-| `find`           | Available | Used to search for modules, kernel artifacts, and `Module.symvers`.     |
-| `grep` / `egrep` | Available | Used for filtering `dmesg`, modules, and proc output.                   |
-| `awk`            | Available | Used in installer checksum and ALSA-card-index commands.                |
-| `sed`            | Available | Used during USB descriptor inspection.                                  |
-| `head` / `tail`  | Available | Used to bound large command output.                                     |
-| `wc`             | Available | Used while comparing `dmesg` output windows.                            |
-| `sha256sum`      | Available | Used by the installer to compare local and remote module checksums.     |
+| Tool             | Status    | Version               | Notes                                                                   |
+| ---------------- | --------- | --------------------- | ----------------------------------------------------------------------- |
+| `cat`            | Available | `GNU coreutils 9.0`   | Used for `/proc/version`, `/proc/asound/*`, and other proc/sysfs files. |
+| `ls`             | Available | `GNU coreutils 9.0`   | Used for `/dev/snd`, `/lib/modules`, and filesystem inspection.         |
+| `find`           | Available | `GNU findutils 4.9.0` | Used to search for modules, kernel artifacts, and `Module.symvers`.     |
+| `grep` / `egrep` | Available | `GNU grep 3.7`        | Used for filtering `dmesg`, modules, and proc output.                   |
+| `awk`            | Available | `GNU Awk 5.1.1`       | Used in installer checksum and ALSA-card-index commands.                |
+| `sed`            | Available | `GNU sed 4.8`         | Used during USB descriptor inspection.                                  |
+| `head` / `tail`  | Available | `GNU coreutils 9.0`   | Used to bound large command output.                                     |
+| `wc`             | Available | `GNU coreutils 9.0`   | Used while comparing `dmesg` output windows.                            |
+| `sha256sum`      | Available | `GNU coreutils 9.0`   | Used by the installer to compare local and remote module checksums.     |
 
 ### Kernel And Module Utilities
 
-| Tool                                               | Status    | Notes                                                              |
-| -------------------------------------------------- | --------- | ------------------------------------------------------------------ |
-| `uname`                                            | Available | Used to confirm `5.15.48-intel-pk-preempt-rt`.                     |
-| `dmesg`                                            | Available | Primary source for `insmod` failures, oops traces, and USB events. |
-| `lsmod`                                            | Available | Used to detect loaded PushBridge and ALSA modules.                 |
-| `insmod`                                           | Available | Used to load out-of-tree `.ko` files.                              |
-| `rmmod`                                            | Available | Used to unload modules by module name, when refcounts allowed it.  |
-| `modinfo`                                          | Available | Used to inspect shipped and built module metadata.                 |
-| `/proc/modules`                                    | Available | Used as a loaded-module inventory.                                 |
-| `/lib/modules/$(uname -r)/modules.builtin`         | Available | Useful for built-in module inference.                              |
-| `/lib/modules/$(uname -r)/modules.builtin.modinfo` | Available | Useful for built-in module metadata when present.                  |
-| `/lib/modules/$(uname -r)/modules.dep`             | Available | Useful for shipped module dependency inference.                    |
-| `/lib/modules/$(uname -r)/modules.symbols`         | Available | Useful for exported-symbol/provider inference.                     |
+| Tool                                               | Status    | Version             | Notes                                                                             |
+| -------------------------------------------------- | --------- | ------------------- | --------------------------------------------------------------------------------- |
+| `uname`                                            | Available | `GNU coreutils 9.0` | Used to confirm `5.15.48-intel-pk-preempt-rt`.                                    |
+| `dmesg`                                            | Available | `util-linux 2.37.4` | Primary source for `insmod` failures, oops traces, and USB events.                |
+| `lsmod`                                            | Available | `kmod 29`           | `lsmod --version` only printed usage, but `/bin/lsmod` is present and functional. |
+| `insmod`                                           | Available | `kmod 29`           | `/sbin/insmod` used to load out-of-tree `.ko` files.                              |
+| `rmmod`                                            | Available | `kmod 29`           | `/sbin/rmmod` used to unload modules by module name, when refcounts allowed it.   |
+| `modinfo`                                          | Available | `kmod 29`           | `/sbin/modinfo` used to inspect shipped and built module metadata.                |
+| `/proc/modules`                                    | Available | N/A                 | Used as a loaded-module inventory.                                                |
+| `/lib/modules/$(uname -r)/modules.builtin`         | Available | N/A                 | Useful for built-in module inference.                                             |
+| `/lib/modules/$(uname -r)/modules.builtin.modinfo` | Available | N/A                 | Useful for built-in module metadata when present.                                 |
+| `/lib/modules/$(uname -r)/modules.dep`             | Available | N/A                 | Useful for shipped module dependency inference.                                   |
+| `/lib/modules/$(uname -r)/modules.symbols`         | Available | N/A                 | Useful for exported-symbol/provider inference.                                    |
 
 ### ALSA And Audio Inspection
 
-| Tool / Path            | Status    | Notes                                                     |
-| ---------------------- | --------- | --------------------------------------------------------- |
-| `aplay`                | Available | Used with `-l`, `-L`, and `--dump-hw-params`.             |
-| `arecord`              | Available | Used with `-l`, `-L`, and `--dump-hw-params`.             |
-| `speaker-test`         | Available | Used during earlier ALSA plugin smoke tests.              |
-| `/proc/asound/cards`   | Available | Primary card-registration check.                          |
-| `/proc/asound/devices` | Available | Used to inspect ALSA kernel device state.                 |
-| `/proc/asound/pcm`     | Available | Used to inspect playback/capture PCM registration.        |
-| `/proc/asound/modules` | Available | Used to map ALSA cards to kernel modules.                 |
-| `/dev/snd/*`           | Available | Used to verify kernel-visible ALSA control and PCM nodes. |
+| Tool / Path            | Status    | Version            | Notes                                                                                                 |
+| ---------------------- | --------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| `aplay`                | Available | `alsa-utils 1.2.6` | Used with `-l`, `-L`, and `--dump-hw-params`.                                                         |
+| `arecord`              | Available | `alsa-utils 1.2.6` | Used with `-l`, `-L`, and `--dump-hw-params`.                                                         |
+| `speaker-test`         | Available | `alsa-utils 1.2.6` | Observed from its runtime banner; `--version` was not supported. Used during ALSA plugin smoke tests. |
+| `/proc/asound/cards`   | Available | N/A                | Primary card-registration check.                                                                      |
+| `/proc/asound/devices` | Available | N/A                | Used to inspect ALSA kernel device state.                                                             |
+| `/proc/asound/pcm`     | Available | N/A                | Used to inspect playback/capture PCM registration.                                                    |
+| `/proc/asound/modules` | Available | N/A                | Used to map ALSA cards to kernel modules.                                                             |
+| `/dev/snd/*`           | Available | N/A                | Used to verify kernel-visible ALSA control and PCM nodes.                                             |
 
 ### USB And Hardware Inspection
 
-| Tool       | Status              | Notes                                                                    |
-| ---------- | ------------------- | ------------------------------------------------------------------------ |
-| `lsusb`    | Available           | Used to inspect Digitakt USB IDs and descriptors.                        |
-| `lsusb -t` | Available           | Used to inspect USB topology and bound drivers.                          |
-| `lsusb -v` | Available           | Used to inspect class-compliant and Overbridge USB descriptors.          |
-| `ip`       | Available           | `ip -4 -o addr show scope global` worked for network address inspection. |
-| `hostname` | Partially available | `hostname` worked, but `hostname -I` was not supported.                  |
+| Tool       | Status              | Version             | Notes                                                           |
+| ---------- | ------------------- | ------------------- | --------------------------------------------------------------- |
+| `lsusb`    | Available           | `usbutils 014`      | Used to inspect Digitakt USB IDs and descriptors.               |
+| `lsusb -t` | Available           | `usbutils 014`      | Used to inspect USB topology and bound drivers.                 |
+| `lsusb -v` | Available           | `usbutils 014`      | Used to inspect class-compliant and Overbridge USB descriptors. |
+| `ip`       | Available           | `iproute2-5.17.0`   | Used for network address inspection.                            |
+| `hostname` | Partially available | `GNU coreutils 9.0` | Worked, but `hostname -I` was not supported.                    |
 
 ### Debugging Tools
 
-| Tool     | Status    | Notes                                                                                                                    |
-| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `strace` | Available | Used earlier to confirm Push Live opens kernel-visible `/dev/snd/*` nodes rather than relying only on ALSA plugin names. |
+| Tool     | Status    | Version | Notes                                                                                                            |
+| -------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
+| `strace` | Available | `5.16`  | Used to confirm Push Live opens kernel-visible `/dev/snd/*` nodes rather than relying only on ALSA plugin names. |
 
 ## Unavailable Or Absent
 
