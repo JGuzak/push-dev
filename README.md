@@ -12,6 +12,8 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
 
 *DISCLAIMER: All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push sw can make any of this informantion obsolite. I'm just taking notes of everything I do in the hopes of helping others navigate and explore what is possible on Push Standalone.*
 
+Information is up to date as of `Live 12.3.x`/`Push 2.x`
+
 Reference for various terms used throught these documents:
 
 | Term            | Abreviation |
@@ -48,6 +50,6 @@ Host push
 A list of links I've found useful while exploring what sort of fun stuff can be added to push 3 standalone.
 
 - [Ableton Forum: Unlock Push 3](https://forum.ableton.com/viewtopic.php?t=248249)
-- [Yocto Kernel]
+- [Yocto Kernel SDK](https://docs.yoctoproject.org/2.1/sdk-manual/sdk-manual.html)
 - [ALSA Driver API](https://www.kernel.org/doc/html/v5.6/sound/kernel-api/alsa-driver-api.html#management-of-cards-and-devices)
 - [Max Docs](https://docs.cycling74.com/)
