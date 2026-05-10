@@ -1,0 +1,13 @@
+# Folders
+.git
+alsa-lib
+build
+
+# File Types
+**/*.o
+**/*.ko
+**/*.mod
+**/*.mod.c
+**/.tmp_versions
+**/Module.symvers
+**/modules.order

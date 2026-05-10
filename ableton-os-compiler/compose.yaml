@@ -1,0 +1,18 @@
+services:
+  ableton-os-compiler:
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile
+      args:
+        TOOLCHAIN_PREFIX: x86_64-oe-linux-
+        GCC_VERSION: 11.5.0
+        BINUTILS_VERSION: "2.38"
+        BINUTILS_REPORTED_VERSION: "2.38.20220708"
+        TARGET_GCC_VERSION: x86_64-oe-linux-gcc (GCC) 11.5.0
+        TARGET_LD_VERSION: GNU ld (GNU Binutils) 2.38.20220708
+    image: ableton-os-compiler:latest
+    init: true
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/src:/src:ro
+      - ${PWD}/build:/out
