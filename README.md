@@ -1,6 +1,6 @@
 # push-dev
 
-A collection of explorations and mods for the [Ableton Push 3 Standalone](https://www.ableton.com/en/push/)
+A collection of explorations and mods for the [Ableton Push 3 Standalone](https://www.ableton.com/en/push/).
 
 - [push-dev](#push-dev)
   - [Abstract](#abstract)
@@ -8,25 +8,22 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
   - [First Time Setup](#first-time-setup)
     - [SSH Access](#ssh-access)
   - [Ableton OS Compiler Environment](#ableton-os-compiler-environment)
-    - [Build Compiler Container](#build-compiler-container)
-    - [Spinning Up Container](#spinning-up-container)
-    - [Cross-Compiling](#cross-compiling)
-      - [Kernel Modules (Drivers)](#kernel-modules-drivers)
-      - [Manual Build (Inside Docker Container)](#manual-build-inside-docker-container)
-      - [Programs (Coming Soon)](#programs-coming-soon)
+    - [Include In A Project](#include-in-a-project)
+    - [Start The Compiler](#start-the-compiler)
+    - [Build Kernel Modules](#build-kernel-modules)
   - [References](#references)
 
 ## Abstract
 
-*DISCLAIMER: All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push sw can make any of this informantion obsolite. I'm just taking notes of everything I do in the hopes of helping others navigate and explore what is possible on Push Standalone.*
+*DISCLAIMER: All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push software can make any of this information obsolete. I'm taking notes in the hope of helping others navigate and explore what is possible on Push Standalone.*
 
-Information is up to date as of `Live 12.4.x`/`Push 2.x`
+Information is up to date as of `Live 12.4.x` / `Push 2.x`.
 
-Reference for various terms used throught these documents:
+Reference for various terms used throughout these documents:
 
-| Term              | Abreviation |
-| ----------------- | ----------- |
-| Push 3 Standalone | P3SA        |
+| Term              | Abbreviation |
+| ----------------- | ------------ |
+| Push 3 Standalone | P3SA         |
 
 ## AbletonOS Docs
 
@@ -37,17 +34,17 @@ Reference for various terms used throught these documents:
 
 ### SSH Access
 
-This is an essential first step. You will need to ssh onto the linux machine running on Push to do any of the fun stuff outlined in this repo.
+This is an essential first step. You will need to ssh onto the Linux machine running on Push to do any of the work outlined in this repo.
 
-1. Generate an SSH key via `ssh-keygen` or similar
-2. Start Push in standalone mode
-3. Ensure your computer and push are both on the same network
-4. Navigate to `http://push.local/ssh` in your web browser
-5. Copy the content of your ssh public key file to your clipboard
-6. Follow the instructions on the push ssh webpage.
-7. SSH onto push with the following command: `ssh ableton@push.local`
+1. Generate an SSH key via `ssh-keygen` or similar.
+2. Start Push in standalone mode.
+3. Ensure your computer and Push are both on the same network.
+4. Navigate to `http://push.local/ssh` in your web browser.
+5. Copy the content of your SSH public key file to your clipboard.
+6. Follow the instructions on the Push SSH webpage.
+7. SSH onto Push with `ssh ableton@push.local`.
 
-Recommended SSH config entry to make life a bit easier when remoting in frequently.
+Recommended SSH config entry:
 
 ```ssh
 Host push
@@ -57,7 +54,7 @@ Host push
 
 ## Ableton OS Compiler Environment
 
-[ableton-os-compiler](./ableton-os-compiler/) is a reverse engineered and containerized compiler environment targeting C/C++ programs for AbletonOS/Push3 Standalone. Newer OS updates may change things and break compatibility.
+[ableton-os-compiler](./ableton-os-compiler/) is a reverse engineered and containerized compiler environment targeting C/C++ programs for AbletonOS / Push 3 Standalone. Newer OS updates may change things and break compatibility.
 
 ```bash
 root@push:~# cat /proc/version
@@ -68,22 +65,49 @@ root@push:~# uname -a
 Linux push 5.15.48-intel-pk-preempt-rt #1 SMP Tue Jun 21 16:59:08 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
-Add this repo as a submodule to your repo:
+### Include In A Project
+
+Add this repo as a submodule to your project:
 
 ```bash
-git submodule add <TODO FIX THIS> ./external/push-dev
+git submodule add <push-dev repo url> ./external/push-dev
 ```
 
-Minimally expected project structure:
+Use this project structure:
 
-```yaml
-├───build
-├───external
-│   └───push-dev
-└───src
+```text
+.
+|-- .env
+|-- build/
+|-- external/
+|   -- push-dev/
+|-- src/
 ```
 
-### Build Compiler Container
+Create a project-root `.env` file that tells the compiler where your module
+sources live and where build output should be written:
+
+```dotenv
+CONTEXT=./external/push-dev/ableton-os-compiler
+SRC=./src
+OUT=./build
+```
+
+The paths are resolved from the consuming project root, not from the
+`push-dev` submodule. This is the same inclusion pattern used by PushBridge.
+
+### Start The Compiler
+
+Run Docker Compose from the consuming project root:
+
+```bash
+docker compose \
+  --project-directory . \
+  --env-file ./.env \
+  -p <your-project>-compiler \
+  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
+  up -d --build ableton-os-compiler
+```
 
 The Docker image builds a minimal prefixed kernel toolchain from GNU sources
 and validates it against the Push kernel tool versions:
@@ -93,66 +117,37 @@ x86_64-oe-linux-gcc (GCC) 11.5.0
 GNU ld (GNU Binutils) 2.38.20220708
 ```
 
-```bash
-docker-compose -f <path to compose.yaml> build
+### Build Kernel Modules
 
-# eg:
-docker-compose -f ./external/push-dev/ableton-os-compiler/compose.yaml build
-```
-
-*Build and spin up container all in one command:*
+Once the container is running, build modules with:
 
 ```bash
-docker-compose -f <path to compose.yaml> -p <name of your project>-compiler up -d --build
+docker compose \
+  --project-directory . \
+  --env-file ./.env \
+  -p <your-project>-compiler \
+  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
+  exec ableton-os-compiler build-kernel-modules
 ```
 
-### Spinning Up Container
+The module build script copies `SRC` into an internal temporary build directory
+before running `make`, then copies `.ko`, `Module.symvers`, and `modules.order`
+outputs into `OUT`.
 
-This container mounts a `src` and `build` path based on the location of the `docker-compose` command.
-
-Navigate to the root of your project then When spinning up the container, the path of the executing command is expected t
+To open a shell inside the compiler:
 
 ```bash
-docker-compose -f <path to compose.yaml> -p <name of your project>-compiler up -d
-
-# eg:
-docker-compose -f ./external/push-dev/ableton-os-compiler/compose.yaml -p test-compiler up -d
+docker compose \
+  --project-directory . \
+  --env-file ./.env \
+  -p <your-project>-compiler \
+  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
+  exec ableton-os-compiler bash
 ```
-
-### Cross-Compiling
-
-Once the container is up and running, it can be used to compile kernel modules or programs from the `src` directory.
-
-#### Kernel Modules (Drivers)
-
-```bash
-docker exec <container name> build-kernel-modules
-
-# eg:
-docker exec test-compiler build-kernel-modules
-```
-
-#### Manual Build (Inside Docker Container)
-
-```bash
-docker exec -it <container ID> bash
-```
-
-The top-level `src` Makefile can build every driver, one driver by name, or
-one driver through `DRIVER`:
-
-```bash
-make -C src
-make -C src elektron
-make -C src m8
-make -C src DRIVER=m8
-```
-
-#### Programs (Coming Soon)
 
 ## References
 
-A list of links I've found useful while exploring what sort of fun stuff can be added to push 3 standalone.
+A list of links I've found useful while exploring what sort of work can be done on Push 3 Standalone.
 
 - [Ableton Forum: Unlock Push 3](https://forum.ableton.com/viewtopic.php?t=248249)
 - [Yocto Kernel SDK](https://docs.yoctoproject.org/2.1/sdk-manual/sdk-manual.html)

@@ -1,7 +1,7 @@
 services:
   ableton-os-compiler:
     build:
-      context: ${PWD}
+      context: ${CONTEXT:?set CONTEXT in the consuming project's .env}
       dockerfile: Dockerfile
       args:
         TOOLCHAIN_PREFIX: x86_64-oe-linux-
@@ -14,5 +14,5 @@ services:
     init: true
     restart: unless-stopped
     volumes:
-      - ${PWD}/src:/src:ro
-      - ${PWD}/build:/out
+      - ${SRC:?set SRC in the consuming project's .env}:/src:ro
+      - ${OUT:?set OUT in the consuming project's .env}:/out
