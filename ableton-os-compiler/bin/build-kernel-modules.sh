@@ -12,11 +12,11 @@ cp -a "${SRC_DIR}/." "${BUILD_DIR}/"
 
 make -C "${BUILD_DIR}" KDIR="${KDIR}"
 
-find "${BUILD_DIR}" -mindepth 2 -maxdepth 2 -type f -name "*.ko" \
+find "${BUILD_DIR}" -maxdepth 1 -type f -name "*.ko" \
     -exec cp {} "${OUT_DIR}/" \;
-find "${BUILD_DIR}" -mindepth 2 -maxdepth 2 -type f -name "Module.symvers" \
-    -exec sh -c 'cp "$1" "$2/$(basename "$(dirname "$1")")-Module.symvers"' sh {} "${OUT_DIR}" \;
-find "${BUILD_DIR}" -mindepth 2 -maxdepth 2 -type f -name "modules.order" \
-    -exec sh -c 'cp "$1" "$2/$(basename "$(dirname "$1")")-modules.order"' sh {} "${OUT_DIR}" \;
+find "${BUILD_DIR}" -maxdepth 1 -type f -name "Module.symvers" \
+    -exec cp {} "${OUT_DIR}/" \;
+find "${BUILD_DIR}" -maxdepth 1 -type f -name "modules.order" \
+    -exec cp {} "${OUT_DIR}/" \;
 
 find "${OUT_DIR}" -maxdepth 1 -type f -name "*.ko" -exec modinfo {} \;
