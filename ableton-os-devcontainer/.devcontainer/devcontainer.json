@@ -1,0 +1,21 @@
+{
+  "name": "Ableton OS Devcontainer",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "ableton-os-devcontainer",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd"
+      ],
+      "settings": {
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "clangd.arguments": [
+          "--background-index",
+          "--header-insertion=never"
+        ]
+      }
+    }
+  }
+}

@@ -7,9 +7,9 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
   - [AbletonOS Docs](#abletonos-docs)
   - [First Time Setup](#first-time-setup)
     - [SSH Access](#ssh-access)
-  - [Ableton OS Compiler Environment](#ableton-os-compiler-environment)
+  - [Ableton OS Devcontainer](#ableton-os-devcontainer)
     - [Include In A Project](#include-in-a-project)
-    - [Start The Compiler](#start-the-compiler)
+    - [Start The Devcontainer](#start-the-devcontainer)
     - [Build Kernel Modules](#build-kernel-modules)
   - [References](#references)
 
@@ -52,9 +52,9 @@ Host push
   User ableton
 ```
 
-## Ableton OS Compiler Environment
+## Ableton OS Devcontainer
 
-[ableton-os-compiler](./ableton-os-compiler/) is a reverse engineered and containerized compiler environment targeting C/C++ programs for AbletonOS / Push 3 Standalone. Newer OS updates may change things and break compatibility.
+[ableton-os-devcontainer](./ableton-os-devcontainer/) is a reverse engineered devcontainer targeting C/C++ programs and kernel modules for AbletonOS / Push 3 Standalone. Newer OS updates may change things and break compatibility, make sure to use the appropriate release tag for this project to ensure compatibility. If the latest tag doesn't match the latest AbletonOS version, please check [issues]() and if one does not exist for the target version, please create a new issue.
 
 ```bash
 root@push:~# cat /proc/version
@@ -84,29 +84,21 @@ Use this project structure:
 |-- src/
 ```
 
-Create a project-root `.env` file that tells the compiler where your module
-sources live and where build output should be written:
+See [project devcontainer template](./ableton-os-devcontainer/project-devcontainer-template/) to include and use this dev container base image in your projects. Key takeaways:
 
-```dotenv
-CONTEXT=./external/push-dev/ableton-os-compiler
-SRC=./src
-OUT=./build
-```
+- The paths are resolved from the consuming project root, not from the
+`push-dev` submodule.
+- The reusable devcontainer config lives at `push-dev/ableton-os-devcontainer/.devcontainer/devcontainer.json` and should follow the pattern outlined in the [template project devcontainer file](./ableton-os-devcontainer/project-devcontainer-template/devcontainer.json).
+- Consuming projects can either reference that config from their own `.devcontainer/devcontainer.json`, or run the compose file directly for one-off usage.
 
-The paths are resolved from the consuming project root, not from the
-`push-dev` submodule. This is the same inclusion pattern used by PushBridge.
+### Start The Devcontainer
 
-### Start The Compiler
+In VS Code, use the command pallette to spin up the dev container from the project folder.
 
-Run Docker Compose from the consuming project root:
+Or run Docker Compose from the consuming project root:
 
 ```bash
-docker compose \
-  --project-directory . \
-  --env-file ./.env \
-  -p <your-project>-compiler \
-  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
-  up -d --build ableton-os-compiler
+docker compose 
 ```
 
 The Docker image builds a minimal prefixed kernel toolchain from GNU sources
@@ -119,31 +111,7 @@ GNU ld (GNU Binutils) 2.38.20220708
 
 ### Build Kernel Modules
 
-Once the container is running, build modules with:
-
-```bash
-docker compose \
-  --project-directory . \
-  --env-file ./.env \
-  -p <your-project>-compiler \
-  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
-  exec ableton-os-compiler build-kernel-modules
-```
-
-The module build script copies `SRC` into an internal temporary build directory
-before running `make`, then copies `.ko`, `Module.symvers`, and `modules.order`
-outputs into `OUT`.
-
-To open a shell inside the compiler:
-
-```bash
-docker compose \
-  --project-directory . \
-  --env-file ./.env \
-  -p <your-project>-compiler \
-  -f ./external/push-dev/ableton-os-compiler/compose.yaml \
-  exec ableton-os-compiler bash
-```
+Once the container is running, enter the dev container and follow the build proccess outlined in your project. Typically this would be a bash script, makefile, or similar mechanism.
 
 ## References
 

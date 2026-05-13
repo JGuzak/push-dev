@@ -1,7 +1,7 @@
 services:
-  ableton-os-compiler:
+  ableton-os-devcontainer:
     build:
-      context: ${CONTEXT:?set CONTEXT in the consuming project's .env}
+      context: ${CONTEXT:-.}
       dockerfile: Dockerfile
       args:
         TOOLCHAIN_PREFIX: x86_64-oe-linux-
@@ -10,9 +10,11 @@ services:
         BINUTILS_REPORTED_VERSION: "2.38.20220708"
         TARGET_GCC_VERSION: x86_64-oe-linux-gcc (GCC) 11.5.0
         TARGET_LD_VERSION: GNU ld (GNU Binutils) 2.38.20220708
-    image: ableton-os-compiler:latest
+    image: ableton-os-devcontainer:latest
     init: true
     restart: unless-stopped
+    working_dir: /workspace
     volumes:
-      - ${SRC:?set SRC in the consuming project's .env}:/src:ro
-      - ${OUT:?set OUT in the consuming project's .env}:/out
+      - ${WORKSPACE:-.}:/workspace
+      - ${SRC:-./src}:/src:ro
+      - ${OUT:-./build}:/out

@@ -1,0 +1,13 @@
+services:
+  ableton-os-devcontainer:
+    extends:
+      file: <relative path to>/push-dev/ableton-os-devcontainer/compose.yaml
+      service: ableton-os-devcontainer
+    build:
+      context: <relative path to>/push-dev/ableton-os-devcontainer
+    container_name: your-project-devcontainer
+    volumes:
+      - ..:/workspace
+      - ../src:/src:ro
+      - ../build:/out
+      - ../release:/release

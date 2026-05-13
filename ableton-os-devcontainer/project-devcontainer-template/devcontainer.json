@@ -1,0 +1,6 @@
+{
+  "name": "PushBridge Ableton OS",
+  "dockerComposeFile": "compose.yaml",
+  "service": "ableton-os-devcontainer",
+  "workspaceFolder": "/workspace"
+}
