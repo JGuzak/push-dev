@@ -129,10 +129,10 @@ RUN make x86_64_defconfig \
         --enable SMP \
         --disable MODVERSIONS \
         --disable MODULE_SIG \
-        --enable DEBUG_INFO \
-        --enable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
-        --enable DEBUG_INFO_BTF \
-        --enable DEBUG_INFO_BTF_MODULES \
+        --disable DEBUG_INFO \
+        --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
+        --disable DEBUG_INFO_BTF \
+        --disable DEBUG_INFO_BTF_MODULES \
         --disable STACKPROTECTOR \
         --disable STACKPROTECTOR_STRONG \
         --disable STACKPROTECTOR_REGULAR \
@@ -141,7 +141,7 @@ RUN make x86_64_defconfig \
         --module SND_TIMER \
         --module SND_PCM \
     && make olddefconfig \
-    && make modules_prepare \
+    && make -j"$(nproc)" vmlinux modules \
     && test "$(make -s kernelrelease)" = "5.15.48${KERNEL_LOCALVERSION}"
 
 WORKDIR /workspace
