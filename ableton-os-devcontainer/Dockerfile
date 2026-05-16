@@ -121,6 +121,11 @@ RUN git clone --depth 1 --branch "${KERNEL_TAG}" "${KERNEL_REPO}" /kernel \
 # Minimal config for external module iteration. This is not claimed to be the
 # exact Push kernel config, this is as goood as it gets for now, no /proc/config.gz, /boot/config-*,
 # /lib/modules/.../build, source, or Module.symvers from AbletonOS 3.20 were found.
+
+# DEBUG_INFO, DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT, DEBUG_INFO_BTF, and DEBUG_INFO_BTF_MODULES
+# must remain enabled. Otherwise kernel modules will fail to load due to module
+# format incompatibilities. Maybe investigate this in the future to avoid warning
+# messages during build while also retaining the ability to actually load said modules.
 RUN make x86_64_defconfig \
     && scripts/config \
         --set-str LOCALVERSION "${KERNEL_LOCALVERSION}" \
@@ -129,10 +134,10 @@ RUN make x86_64_defconfig \
         --enable SMP \
         --disable MODVERSIONS \
         --disable MODULE_SIG \
-        --disable DEBUG_INFO \
-        --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
-        --disable DEBUG_INFO_BTF \
-        --disable DEBUG_INFO_BTF_MODULES \
+        --enable DEBUG_INFO \
+        --enable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
+        --enable DEBUG_INFO_BTF \
+        --enable DEBUG_INFO_BTF_MODULES \
         --disable STACKPROTECTOR \
         --disable STACKPROTECTOR_STRONG \
         --disable STACKPROTECTOR_REGULAR \
@@ -141,7 +146,7 @@ RUN make x86_64_defconfig \
         --module SND_TIMER \
         --module SND_PCM \
     && make olddefconfig \
-    && make -j"$(nproc)" vmlinux modules \
+    && make modules_prepare \
     && test "$(make -s kernelrelease)" = "5.15.48${KERNEL_LOCALVERSION}"
 
 WORKDIR /workspace
