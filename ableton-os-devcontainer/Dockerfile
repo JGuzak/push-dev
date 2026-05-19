@@ -27,6 +27,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     bzip2 \
     ca-certificates \
+    clang \
+    clang-format \
     cpio \
     dwarves \
     file \
