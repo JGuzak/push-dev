@@ -50,6 +50,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     xz-utils \
     zlib1g-dev \
+    zip \
     vim \
     && rm -rf /var/lib/apt/lists/*
 
