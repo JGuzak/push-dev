@@ -9,8 +9,8 @@ Target context observed during collection:
 - Device: Ableton Push 3 Standalone
 - OS family: AbletonOS x86_64 Intel image
 - AbletonOS: `3.20` (`AbletonOS abletonos-x86_64-intel-v3.20`)
-- Live: `12.4b17`
-- Push FW: `2.4b17`
+- Live: `12.4.2`
+- Push FW: `2.4.2`
 - Kernel: `5.15.48-intel-pk-preempt-rt`
 - Remote access used: `ssh root@push` / `scp`
 

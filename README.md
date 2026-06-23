@@ -17,7 +17,7 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
 
 *DISCLAIMER: All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push software can make any of this information obsolete. I'm taking notes in the hope of helping others navigate and explore what is possible on Push Standalone.*
 
-Information is up to date as of `Live 12.4.x` / `Push 2.x`.
+Information is up to date as of `Live 12.4.2` / `Push 2.4.2`.
 
 Reference for various terms used throughout these documents:
 
