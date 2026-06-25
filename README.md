@@ -27,6 +27,8 @@ Reference for various terms used throughout these documents:
 
 ## AbletonOS Docs
 
+SSH authorized keys path: `/data/settings/ssh/authorized_keys`
+
 - [Toolset](./docs/AbletonOS-toolset.md)
 - [Max4Live](./docs/AbletonOS-max-env.md)
 
