@@ -7,6 +7,8 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
   - [AbletonOS Docs](#abletonos-docs)
   - [First Time Setup](#first-time-setup)
     - [SSH Access](#ssh-access)
+  - [Preferences.cfg Reverse Engineering](#preferencescfg-reverse-engineering)
+    - [Push 3 Standalone Preferences Sideload Check](#push-3-standalone-preferences-sideload-check)
   - [Ableton OS Devcontainer](#ableton-os-devcontainer)
     - [Include In A Project](#include-in-a-project)
     - [Start The Devcontainer](#start-the-devcontainer)
@@ -50,6 +52,51 @@ Recommended SSH config entry:
 Host push
   HostName push.local
   User ableton
+```
+
+## Preferences.cfg Reverse Engineering
+
+Using [ImHex](https://imhex.werwolv.net/) to decode binary preferences data.
+
+Vanila config files are saved per version of Live under `/reverse-engineering/preferences-config/` for tracking changes over time.
+
+| Platform          | Path                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| Windows           | C:\Users\<user name>\AppData\Roaming\Ableton\Live 12.4.3\Preferences\Preferences.cfg |
+| Push 3 Standalone | /data/.config/Ableton/Live <version>/Preferences.cfg                                 |
+| MacOS             |                                                                                      |
+
+### Push 3 Standalone Preferences Sideload Check
+
+Before editing arbitrary bytes, verify that Push Live will accept a sideloaded
+`Preferences.cfg` that was already produced by Live. The helper script defaults
+to dry-run discovery:
+
+```powershell
+.\scripts\push-preferences-sideload.ps1
+```
+
+Install one known-good captured preference file:
+
+```powershell
+.\scripts\push-preferences-sideload.ps1 -LocalCfg .\preferences\p3sa\in-m-1-2-enabled.cfg
+```
+
+Restart Live or reboot Push, then verify that Live did not rewrite or reject the
+file:
+
+```powershell
+.\scripts\push-preferences-sideload.ps1 -VerifyOnly -LocalCfg .\preferences\p3sa\in-m-1-2-enabled.cfg
+```
+
+If the remote SHA-256 still matches the local SHA-256 after restart, the
+sideload path is viable. The script creates a timestamped backup next to the
+remote `Preferences.cfg` before replacing it.
+
+If Live rejects a broken file, remove it and power cycle Push so Live regenerates defaults:
+
+```powershell
+.\scripts\push-preferences-sideload.ps1 -DeleteRemotePreferences
 ```
 
 ## Ableton OS Devcontainer
