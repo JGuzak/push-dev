@@ -1,20 +1,14 @@
 services:
-  ableton-os-devcontainer:
-    extends:
-      file: ../../../ableton-os-devcontainer/compose.yaml
-      service: ableton-os-devcontainer
-
-  hello-world-devcontainer:
-    extends:
-      file: ../../../ableton-os-devcontainer/compose.yaml
-      service: ableton-os-devcontainer
+  push-hello-world-devcontainer:
     build:
       context: .
       dockerfile: Dockerfile
-      additional_contexts:
-        ableton-os-devcontainer: service:ableton-os-devcontainer
-    image: hello-world-devcontainer:latest
-    container_name: hello-world-devcontainer
+      pull: false
+    pull_policy: never
+    container_name: push-hello-world-devcontainer
+    init: true
+    restart: unless-stopped
+    working_dir: /workspace
     volumes:
       - ..:/workspace
       - ../src:/src:ro

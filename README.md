@@ -13,6 +13,8 @@ A collection of explorations and mods for the [Ableton Push 3 Standalone](https:
     - [Include In A Project](#include-in-a-project)
     - [Start The Devcontainer](#start-the-devcontainer)
     - [Build Kernel Modules](#build-kernel-modules)
+  - [Example Projects](#example-projects)
+    - [Hello World Project](#hello-world-project)
   - [References](#references)
 
 ## Abstract
@@ -103,7 +105,7 @@ If Live rejects a broken file, remove it and power cycle Push so Live regenerate
 
 ## Ableton OS Devcontainer
 
-[ableton-os-devcontainer](./ableton-os-devcontainer/) is a reverse engineered devcontainer targeting C/C++ programs and kernel modules for AbletonOS / Push 3 Standalone. Newer OS updates may change things and break compatibility, make sure to use the appropriate release tag for this project to ensure compatibility. If the latest tag doesn't match the latest AbletonOS version, please check [issues]() and if one does not exist for the target version, please create a new issue.
+[ableton-os-devcontainer](./ableton-os-devcontainer/) is a reverse engineered devcontainer targeting C/C++ programs and kernel modules for `AbletonOS` / `Push 3 Standalone`. Newer OS updates may change things and break compatibility, make sure to use the appropriate release tag for this project to ensure compatibility. If the latest tag doesn't match the latest AbletonOS version, please check [issues]() and if one does not exist for the target version, please create a new issue.
 
 ```bash
 root@push:~# cat /proc/version
@@ -119,14 +121,16 @@ Linux push 5.15.48-intel-pk-preempt-rt #1 SMP Tue Jun 21 16:59:08 UTC 2022 x86_6
 Add this repo as a submodule to your project:
 
 ```bash
-git submodule add <push-dev repo url> ./external/push-dev
+git submodule add https://github.com/JGuzak/push-dev ./external/push-dev
 ```
 
 Use this project structure:
 
 ```text
 .
+|-- .devcontainer/
 |-- .env
+|-- .vscode/
 |-- build/
 |-- external/
 |   -- push-dev/
@@ -142,12 +146,13 @@ See [project devcontainer template](./ableton-os-devcontainer/project-devcontain
 
 ### Start The Devcontainer
 
-In VS Code, use the command pallette to spin up the dev container from the project folder.
+In `VS Code`, use the [dev container extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and command pallette `Dev Containers: Open folder in Container...` to spin up the dev container from the project folder.
 
 Or run Docker Compose from the consuming project root:
 
 ```bash
-docker compose 
+cd .devcontainer
+docker compose up -d
 ```
 
 The Docker image builds a minimal prefixed kernel toolchain from GNU sources
@@ -161,6 +166,16 @@ GNU ld (GNU Binutils) 2.38.20220708
 ### Build Kernel Modules
 
 Once the container is running, enter the dev container and follow the build proccess outlined in your project. Typically this would be a bash script, makefile, or similar mechanism.
+
+## Example Projects
+
+### Hello World Project
+
+> [!NOTE]
+> Make sure the path to ableton-os-devcontainer compose file is correct when copying this example into your own project.
+> ./examples/hello-world/.devcontainer/devcontainer.json
+> line 6:
+> `"initializeCommand": "docker-compose.exe -f <path to push-dev repo>/ableton-os-devcontainer/compose.yaml build ableton-os-devcontainer",`
 
 ## References
 
