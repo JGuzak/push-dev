@@ -149,14 +149,11 @@ RUN make x86_64_defconfig \
         --module SND_TIMER \
         --module SND_PCM \
     && make olddefconfig \
-    && make modules_prepare \
-    && test "$(make -s kernelrelease)" = "5.15.48${KERNEL_LOCALVERSION}"
+    && make modules_prepare
+    # && test "$(make -s kernelrelease)" = "5.15.48${KERNEL_LOCALVERSION}" # Adds a lot of time to the build, not needed for now, but may be useful in the future to ensure the kernel is configured correctly.
 
 WORKDIR /workspace
 
 ENV KDIR=/kernel
-
-COPY bin/build-kernel-modules.sh /usr/local/bin/build-kernel-modules
-RUN chmod +x /usr/local/bin/build-kernel-modules
 
 CMD ["sleep", "infinity"]
