@@ -33,6 +33,7 @@ Target context observed during collection:
     - [Kernel And Module Utilities](#kernel-and-module-utilities)
     - [ALSA And Audio Inspection](#alsa-and-audio-inspection)
     - [USB And Hardware Inspection](#usb-and-hardware-inspection)
+    - [Network And Service Discovery Runtime](#network-and-service-discovery-runtime)
     - [Debugging Tools](#debugging-tools)
   - [Unavailable Or Absent](#unavailable-or-absent)
     - [Build Toolchain And Kernel Build Artifacts](#build-toolchain-and-kernel-build-artifacts)
@@ -110,6 +111,95 @@ Target context observed during collection:
 | `lsusb -v` | Available           | usbutils 014      | Used to inspect class-compliant and Overbridge USB descriptors. |
 | `ip`       | Available           | iproute2-5.17.0   | Used for network address inspection.                            |
 | `hostname` | Partially available | GNU coreutils 9.0 | Worked, but `hostname -I` was not supported.                    |
+
+PushDisplayNDI non-invasive libusb probe results:
+
+```text
+XMOS USB device: 2982:1969
+Interface 0: vendor-specific display I/O
+Endpoint 0x01: bulk OUT, max packet 512
+Endpoint 0x81: bulk IN, max packet 512
+Interface 0 kernel_driver_active=0
+```
+
+The probe dynamically loaded `libusb-1.0.so.0`, opened the device, checked
+descriptors and kernel-driver state, and exited without claiming interfaces or
+performing transfers.
+
+PushDisplayNDI claim test results:
+
+```text
+libusb_claim_interface(0) => LIBUSB_ERROR_BUSY
+```
+
+The claim test performed no transfers and did not detach kernel drivers. This
+indicates that Push3 already owns interface 0 from userspace while running, even
+though no kernel driver is attached to that interface.
+
+PushDisplayNDI passive kernel observer results:
+
+```text
+module: push_display_tap.ko
+hook: kprobe on usb_submit_urb
+interface ownership: none claimed by module
+transfers submitted by module: none
+buffer mutation: none
+observed in ~2 seconds:
+  display_headers=118
+  display_payloads=118
+  last_len=327680
+  last_header=ff cc aa 88
+  active_bus=1
+  active_devnum=5
+```
+
+The module auto-detected display traffic from the endpoint `0x01` frame header
+and unloaded cleanly after the bounded test. This confirms that a usbmon-like
+passive observer can see Push display URBs without claiming the interface.
+
+Project-specific display tap design and planned module features live in
+`docs/push-display-tap.md`.
+
+### Network And Service Discovery Runtime
+
+Observed while checking whether an NDI sender built from the bundled NDI SDK can
+run on Push Standalone.
+
+| Runtime / Library              | Status        | Path / Notes                                                                 |
+| ------------------------------ | ------------- | ---------------------------------------------------------------------------- |
+| Dynamic loader                 | Available     | `/lib/ld-linux-x86-64.so.2`; `/lib64/ld-linux-x86-64.so.2` was not present.   |
+| `libc.so.6`                    | Available     | `/lib/libc.so.6`                                                              |
+| `libgcc_s.so.1`                | Available     | `/lib/libgcc_s.so.1`                                                          |
+| `libstdc++.so.6`               | Available     | `/usr/lib/libstdc++.so.6`                                                     |
+| `libavahi-common.so.3`         | Available     | `/usr/lib/libavahi-common.so.3` and `/usr/lib/libavahi-common.so.3.5.4`       |
+| `libavahi-core.so.7`           | Available     | Reported by `ldconfig -p`                                                     |
+| `libavahi-client.so.3`         | Not found     | Required by NDI SDK `libndi.so.6`; absent from `find /` and `ldconfig -p`.    |
+| `avahi-daemon`                 | Available     | Present in the boot/service inventory; mDNS is used for `push.local`.         |
+
+NDI SDK `libndi.so.6` has hard ELF `NEEDED` dependencies on
+`libavahi-common.so.3` and `libavahi-client.so.3`. NDI Discovery Server can be
+used to avoid mDNS advertising for senders, but it does not remove the Linux
+runtime loader dependency on `libavahi-client.so.3`; the library must still be
+present before `libndi.so.6` can load.
+
+Push provides `libavahi-common.so.3` but not `libavahi-client.so.3`. A compatible
+runtime copy was taken from Ubuntu 22.04/Jammy `libavahi-client3`
+(`0.8-5ubuntu5.5`) because both the dev container and Push run glibc 2.35. The
+copied library requires GLIBC symbols no newer than `GLIBC_2.34` and depends on
+`libdbus-1.so.3`, `libavahi-common.so.3`, and `libc.so.6`; all three are present
+on Push. For PushDisplayNDI, package this file next to `libndi.so.6`:
+
+```text
+lib/avahi/x86_64-linux-gnu/libavahi-client.so.3
+```
+
+Push does not provide `/lib64/ld-linux-x86-64.so.2`; dynamically linked
+executables must request `/lib/ld-linux-x86-64.so.2` instead. This was verified
+with `LD_TRACE_LOADED_OBJECTS=1` on Push after copying the PushDisplayNDI
+payload to `/tmp`: the loader resolved vendored `libndi.so.6` and
+`libavahi-client.so.3` from the payload directory and resolved
+`libavahi-common.so.3`, `libdbus-1.so.3`, `libstdc++.so.6`, `libgcc_s.so.1`,
+and `libc.so.6` from Push system paths.
 
 ### Debugging Tools
 
