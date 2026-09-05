@@ -1,26 +1,24 @@
-# push-dev
+<h1>Push 3 Standalone Development Tools</h1>
 
 A collection of explorations and tools for the [Ableton Push 3 Standalone](https://www.ableton.com/en/push/).
 
-- [push-dev](#push-dev)
-  - [Abstract](#abstract)
-  - [AbletonOS](#abletonos)
-    - [Out of Tree Modules](#out-of-tree-modules)
-  - [First Time Setup](#first-time-setup)
-    - [SSH Access](#ssh-access)
-  - [Preferences.cfg Reverse Engineering](#preferencescfg-reverse-engineering)
-    - [Push 3 Standalone Preferences Sideload Check](#push-3-standalone-preferences-sideload-check)
-  - [Ableton OS Devcontainer](#ableton-os-devcontainer)
-    - [Include In A Project](#include-in-a-project)
-    - [Start The Devcontainer](#start-the-devcontainer)
-    - [Build Kernel Modules](#build-kernel-modules)
-  - [Example Projects](#example-projects)
-    - [Hello World Project](#hello-world-project)
-  - [References](#references)
+- [Disclaimer](#disclaimer)
+- [Abstract](#abstract)
+- [Paths](#paths)
+- [First Time Setup](#first-time-setup)
+  - [SSH Access](#ssh-access)
+- [Dev Kernel Modules and Programs](#dev-kernel-modules-and-programs)
+- [Preferences.cfg Reverse Engineering](#preferencescfg-reverse-engineering)
+  - [Push 3 Standalone Preferences Sideload Check](#push-3-standalone-preferences-sideload-check)
+- [References](#references)
+
+## Disclaimer
+
+All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push software can make any of this information obsolete.
+
+I'm taking notes and sharing tools in the hope of helping others navigate and explore what is possible on Push Standalone.
 
 ## Abstract
-
-*DISCLAIMER: All of this is under construction. I'm still figuring things out and new releases of AbletonOS and/or Push software can make any of this information obsolete. I'm taking notes in the hope of helping others navigate and explore what is possible on Push Standalone.*
 
 Information is up to date as of `Live 12.4.2` / `Push 2.4.2`.
 
@@ -30,18 +28,12 @@ Reference for various terms used throughout these documents:
 | ----------------- | ------------ |
 | Push 3 Standalone | P3SA         |
 
-## AbletonOS
+## Paths
 
 SSH authorized keys path: `/data/settings/ssh/authorized_keys`
 
 - [Toolset](./docs/AbletonOS-toolset.md)
 - [Max4Live](./docs/AbletonOS-max-env.md)
-
-### Out of Tree Modules
-
-AbletonOS doesn't come with a number of useful tools from the linux kernel. These are modules that were built via the cross-compiler dev container and can be loaded onto Push 3 Standalone.
-
-- [usbmon](docs/modules/usbmon.md)
 
 ## First Time Setup
 
@@ -64,6 +56,12 @@ Host push
   HostName push.local
   User ableton
 ```
+
+## Dev Kernel Modules and Programs
+
+AbletonOS doesn't come with a number of useful tools from the linux kernel. These are modules that were built via the cross-compiler dev container and can be loaded onto Push 3 Standalone.
+
+- [usbmon](docs/modules/usbmon.md)
 
 ## Preferences.cfg Reverse Engineering
 
@@ -109,80 +107,6 @@ If Live rejects a broken file, remove it and power cycle Push so Live regenerate
 ```powershell
 .\scripts\push-preferences-sideload.ps1 -DeleteRemotePreferences
 ```
-
-## Ableton OS Devcontainer
-
-[ableton-os-devcontainer](./ableton-os-devcontainer/) is a reverse engineered devcontainer targeting C/C++ programs and kernel modules for `AbletonOS` / `Push 3 Standalone`. Newer OS updates may change things and break compatibility, make sure to use the appropriate release tag for this project to ensure compatibility. If the latest tag doesn't match the latest AbletonOS version, please check [issues]() and if one does not exist for the target version, please create a new issue.
-
-```bash
-root@push:~# cat /proc/version
-Linux version 5.15.48-intel-pk-preempt-rt (ci@abletonos-linux-noble-00) (x86_64-oe-linux-gcc (GCC) 11.5.0, GNU ld (GNU Binutils) 2.38.20220708) #1 SMP Tue Jun 21 16:59:08 UTC 2022
-root@push:~# cat /proc/sys/kernel/osrelease
-5.15.48-intel-pk-preempt-rt
-root@push:~# uname -a
-Linux push 5.15.48-intel-pk-preempt-rt #1 SMP Tue Jun 21 16:59:08 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-```
-
-### Include In A Project
-
-Add this repo as a submodule to your project:
-
-```bash
-git submodule add https://github.com/JGuzak/push-dev ./external/push-dev
-```
-
-Use this project structure:
-
-```text
-.
-|-- .devcontainer/
-|-- .env
-|-- .vscode/
-|-- build/
-|-- external/
-|   -- push-dev/
-|-- src/
-```
-
-See [project devcontainer template](./ableton-os-devcontainer/project-devcontainer-template/) to include and use this dev container base image in your projects. Key takeaways:
-
-- The paths are resolved from the consuming project root, not from the
-`push-dev` submodule.
-- The reusable devcontainer config lives at `push-dev/ableton-os-devcontainer/.devcontainer/devcontainer.json` and should follow the pattern outlined in the [template project devcontainer file](./ableton-os-devcontainer/project-devcontainer-template/devcontainer.json).
-- Consuming projects can either reference that config from their own `.devcontainer/devcontainer.json`, or run the compose file directly for one-off usage.
-
-### Start The Devcontainer
-
-In `VS Code`, use the [dev container extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and command pallette `Dev Containers: Open folder in Container...` to spin up the dev container from the project folder.
-
-Or run Docker Compose from the consuming project root:
-
-```bash
-cd .devcontainer
-docker compose up -d
-```
-
-The Docker image builds a minimal prefixed kernel toolchain from GNU sources
-and validates it against the Push kernel tool versions:
-
-```text
-x86_64-oe-linux-gcc (GCC) 11.5.0
-GNU ld (GNU Binutils) 2.38.20220708
-```
-
-### Build Kernel Modules
-
-Once the container is running, enter the dev container and follow the build proccess outlined in your project. Typically this would be a bash script, makefile, or similar mechanism.
-
-## Example Projects
-
-### Hello World Project
-
-> [!NOTE]
-> Make sure the path to ableton-os-devcontainer compose file is correct when copying this example into your own project.
-> ./examples/hello-world/.devcontainer/devcontainer.json
-> line 6:
-> `"initializeCommand": "docker-compose.exe -f <path to push-dev repo>/ableton-os-devcontainer/compose.yaml build ableton-os-devcontainer",`
 
 ## References
 
