@@ -1,13 +1,11 @@
 services:
-  push-hello-world-devcontainer:
+  push-dev-devcontainer:
     build:
       context: .
       dockerfile: Dockerfile
       pull: false
     pull_policy: never
-    container_name: push-hello-world-devcontainer
     init: true
-    restart: unless-stopped
     working_dir: /workspace
     volumes:
       - ..:/workspace

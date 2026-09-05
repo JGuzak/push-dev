@@ -1,10 +1,11 @@
 # push-dev
 
-A collection of explorations and mods for the [Ableton Push 3 Standalone](https://www.ableton.com/en/push/).
+A collection of explorations and tools for the [Ableton Push 3 Standalone](https://www.ableton.com/en/push/).
 
 - [push-dev](#push-dev)
   - [Abstract](#abstract)
-  - [AbletonOS Docs](#abletonos-docs)
+  - [AbletonOS](#abletonos)
+    - [Out of Tree Modules](#out-of-tree-modules)
   - [First Time Setup](#first-time-setup)
     - [SSH Access](#ssh-access)
   - [Preferences.cfg Reverse Engineering](#preferencescfg-reverse-engineering)
@@ -29,12 +30,18 @@ Reference for various terms used throughout these documents:
 | ----------------- | ------------ |
 | Push 3 Standalone | P3SA         |
 
-## AbletonOS Docs
+## AbletonOS
 
 SSH authorized keys path: `/data/settings/ssh/authorized_keys`
 
 - [Toolset](./docs/AbletonOS-toolset.md)
 - [Max4Live](./docs/AbletonOS-max-env.md)
+
+### Out of Tree Modules
+
+AbletonOS doesn't come with a number of useful tools from the linux kernel. These are modules that were built via the cross-compiler dev container and can be loaded onto Push 3 Standalone.
+
+- [usbmon](docs/modules/usbmon.md)
 
 ## First Time Setup
 

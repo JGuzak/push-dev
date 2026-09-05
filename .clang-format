@@ -1,0 +1,78 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Match Linux kernel coding style used by the kernel submodule.
+UseTab: Always
+TabWidth: 8
+IndentWidth: 8
+ContinuationIndentWidth: 8
+ColumnLimit: 80
+
+BreakBeforeBraces: Linux
+IndentCaseLabels: false
+IndentGotoLabels: false
+AccessModifierOffset: -8
+NamespaceIndentation: None
+
+PointerAlignment: Right
+DerivePointerAlignment: false
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Cpp11BracedListStyle: false
+
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: true
+AlignTrailingComments: false
+
+BinPackArguments: true
+BinPackParameters: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+
+SortIncludes: false
+ReflowComments: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+ForEachMacros:
+  - list_for_each
+  - list_for_each_entry
+  - list_for_each_entry_safe
+  - hlist_for_each
+  - hlist_for_each_entry
+  - hlist_for_each_entry_safe
+  - radix_tree_for_each_slot
+  - xa_for_each
+  - xa_for_each_start
+  - idr_for_each_entry
+  - for_each_possible_cpu
+  - for_each_online_cpu
+  - for_each_present_cpu
+  - for_each_cpu
+  - for_each_node
+  - for_each_node_state
+  - for_each_set_bit
+  - for_each_clear_bit
+
+StatementMacros:
+  - EXPORT_SYMBOL
+  - EXPORT_SYMBOL_GPL
+  - MODULE_AUTHOR
+  - MODULE_DESCRIPTION
+  - MODULE_LICENSE
+  - MODULE_DEVICE_TABLE
+  - module_usb_driver
+  - module_init
+  - module_exit
+...

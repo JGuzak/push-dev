@@ -1,0 +1,20 @@
+{
+  "name": "push-dev devcontainer",
+  "dockerComposeFile": "compose.yaml",
+  "service": "push-dev-devcontainer",
+  "workspaceFolder": "/workspace",
+  "initializeCommand": "docker-compose.exe -f external/ableton-os-devcontainer/compose.yaml build ableton-os-devcontainer",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.makefile-tools",
+        "xaver.clang-format",
+        "bierner.markdown-mermaid",
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint",
+        "ms-vscode.powershell"
+      ]
+    }
+  }
+}
